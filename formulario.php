@@ -4,17 +4,6 @@ $dbPath = __DIR__ . '/banco.sqlite';
 $pdo = new PDO("sqlite:$dbPath");
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-$video = [
-    'url' => '',
-    'title' => '',
-];
-if($id!== false && $id!==null){
-    $statement =  $pdo->prepare('SELECT * FROM videos WHERE id= ?;');
-    $statement->bindValue(1, $id,PDO::PARAM_INT);
-    $statement->execute();
-    $video = $statement->fetch(PDO::FETCH_ASSOC);
-}
-
 ?>
 
 <?php require_once 'inicio-html.php'?>

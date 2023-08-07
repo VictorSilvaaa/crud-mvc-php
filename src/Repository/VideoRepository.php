@@ -58,7 +58,10 @@ class VideoRepository
             return $video;
        },
        $videoList
-    );
-           
+        );      
+    }
+    public function find($id)
+    {
+
     }
 }
