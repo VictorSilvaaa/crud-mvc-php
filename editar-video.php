@@ -1,5 +1,8 @@
 <?php
 
+use Joao\Mvc\Entity\Video;
+use Joao\Mvc\Repository\VideoRepository;
+
 $dbPath = __DIR__ . '/banco.sqlite';
 $pdo = new PDO("sqlite:$dbPath");
 
@@ -10,18 +13,15 @@ $url = filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL);
 
 
 if($id===false || $titulo===false  || $url===false ){
-    header('location: /index.php?sucesso=0');
+    header('location: /?sucesso=0');
     exit();
 }
+$video = new Video($url, $titulo);
+$video->setId($id);
 
-$sql ='UPDATE videos SET url = :url, title = :title WHERE id= :id;';
-$statement = $pdo->prepare($sql);
-$statement->bindValue('url', $url);
-$statement->bindValue('title', $titulo);
-$statement->bindValue('id', $id, PDO::PARAM_INT);
-
-if($statement->execute() === false){
-    header('location: /index.php?sucesso=0');
+$repository = new VideoRepository($pdo);
+if($repository->update($video) === false){
+    header('location: /?sucesso=0');
 }else{
-    header('location: /index.php?sucesso=1');
+    header('location: /?sucesso=1');
 }
