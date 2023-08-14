@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Joao\Mvc\Controller\DeleteVideoController;
+use Joao\Mvc\Controller\EditVideoController;
+use Joao\Mvc\Controller\Error404Controller;
+use Joao\Mvc\Controller\NewVideoController;
+use Joao\Mvc\Controller\VideoFormController;
 use Joao\Mvc\Controller\VideoListController;
 use Joao\Mvc\Repository\VideoRepository;
 
@@ -11,23 +16,18 @@ $dbPath = __DIR__ . '/../banco.sqlite';
 $pdo = new \PDO("sqlite:$dbPath");
 $videoRepository = new VideoRepository($pdo);
 
-if(!array_key_exists('PATH_INFO', $_SERVER)|| $_SERVER['PATH_INFO']=== '/'){
-    $controller = new VideoListController($videoRepository);
-    $controller->processaRequisicao();
-}elseif($_SERVER['PATH_INFO']=='/novo-video'){
-    if ($_SERVER['REQUEST_METHOD']==='GET') {
-        require_once  __DIR__ . '/../formulario.php';
-    }elseif ($_SERVER['REQUEST_METHOD']==='POST') {
-        require_once __DIR__ . '/../novo-video.php';
-    }
-}elseif ($_SERVER['PATH_INFO']=='/editar-video') {
-    if ($_SERVER['REQUEST_METHOD']==='GET') {
-        require_once __DIR__ . '/../formulario.php';
-    }elseif ($_SERVER['REQUEST_METHOD']==='POST') {
-        require_once __DIR__ . '/../editar-video.php';
-    }
-}elseif ($_SERVER['PATH_INFO']=='/remover-video') {
-    require_once __DIR__ . '/../remover-video.php';
+$routes = require_once __DIR__ . '/../config/routes.php';
+
+$pathInfo= $_SERVER['PATH_INFO'] ?? '/';
+$httpMethod = $_SERVER['REQUEST_METHOD'];
+
+$key = "$httpMethod|$pathInfo";
+
+if(array_key_exists($key, $routes)){
+    $controllerClass = $routes[$key];
+    $controller = new $controllerClass($videoRepository);
 }else{
-    http_response_code(404);
+    $controller = new \Joao\Mvc\Controller\Error404Controller();
 }
+$controller->processaRequisicao();
+
